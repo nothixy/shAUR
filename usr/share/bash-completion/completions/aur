@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+_aur() {
+local cur=${COMP_WORDS[COMP_CWORD]}
+if [ "${#COMP_WORDS[@]}" = "2" ]
+then
+COMPREPLY=($(compgen -W "-i -d -u -h -s -l -a -p --install --update --download --search --pkgbuild --info --list --help --usage" -- ${cur}))
+fi
+}
+complete -F _aur aur
