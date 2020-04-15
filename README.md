@@ -4,4 +4,4 @@
 
 ## How to use
 
-Copy usr/* to /usr/, and run aur
+Copy everything to /usr/, and run aur
