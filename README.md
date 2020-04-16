@@ -5,3 +5,5 @@
 ## How to use
 
 Copy everything to /usr/, and run aur
+
+Supports bash-completion
