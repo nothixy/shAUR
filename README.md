@@ -6,4 +6,4 @@
 
 Copy everything to /usr/, and run aur
 
-Supports bash-completion
+Supports bash-completion, pacman syntax
