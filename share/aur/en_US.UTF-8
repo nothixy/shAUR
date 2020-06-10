@@ -18,7 +18,7 @@ doesnotexists1="${red}Package "
 doesnotexists2="doesn't exist${none}"
 
 isnotinstalled1="${red}Package "
-isnotinstalled2"is not installed${none}"
+isnotinstalled2="is not installed${none}"
 
 makepkgroot="You must not be root, Makepkg will be angry"
 
