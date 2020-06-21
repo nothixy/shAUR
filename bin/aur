@@ -58,6 +58,7 @@ recheckroot() {
 
 askroot() {
   read -n 1 -p "$ignoreroot" r
+  echo
   case $r in
     ${yes} | ${Yes} ) echo Ignoring ;;
     ${no} | ${No} ) recheckroot ;;
@@ -117,11 +118,13 @@ install() {
   checkroot
   installloop="0"
   read -n 1 -p "$ignorechecks" f
+  echo
   case $f in
     ${yes} | ${Yes} ) export skip="--skipinteg" ;;
     ${no} | ${No} ) export skip= ;;
   esac
   read -n 1 -p "$clean" c
+  echo
   case $c in
     ${yes} | ${Yes} ) export clean="rc" ;;
     ${no} | ${No} ) export clean= ;;
@@ -148,6 +151,7 @@ install() {
     makepkg -si$clean $skip 
   fi
   read -n 1 -p "$removesrc" d
+  echo
   case $d in
     ${yes} | ${Yes} ) rm -rf $tmpdir/$currentpkg ;;
     ${no} | ${No} ) ;;
@@ -156,6 +160,7 @@ install() {
 
 asktoinstall() {
   read -n 1 -p "$reinstall" in
+  echo
   case $in in
     ${yes} | ${Yes} ) install $currentpkg ;;
     ${no} | ${No} ) ;;
@@ -191,6 +196,7 @@ info() {
 search() {
   check
   read -n 1 -p "$searchname" n
+  echo
   case $n in
     ${yes} | ${Yes} ) export name="name" ;;
     ${no} | ${No} ) export name= ;;
@@ -241,6 +247,7 @@ checkdifferences_partial() {
     export currentpkg=${ALL[$difpartloop]}
     if [ -z "$(diff -y $tmpfile $tmpfile2 | grep $currentpkg | grep "|")" ]
       then read -n 1 -p "$askupdate1 $currentpkg $askupdate2" fup
+      echo
       case $fup in
         ${yes} | ${Yes} ) echo $currentpkg >> $tmpfile3 ;;
         ${no} | ${No} ) ;;
