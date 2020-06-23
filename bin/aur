@@ -17,7 +17,7 @@ arg=${2}
 source /usr/share/aur/${LANG}
 
 usage() {
-  echo -e "
+	echo -e "
 \taur : a simple aur helper written in bash
 
 \tusage : aur [command] <package>
@@ -36,287 +36,287 @@ exit
 }
 
 ifexists() {
-  existloop="0"
-  ((total--))
-  while [ "${existloop}" != "${total}" ]
-    do
-      export currentpkg=${ALL[$existloop]}
-      if [ -z "$(git ls-remote "https://aur.archlinux.org/${currentpkg}.git")" ]
-        then echo -e "${red}Package ${currentpkg} doesn't exist${none}"
-        exit
-      fi
-      ((existloop++))
-    done
+	existloop="0"
+	((total--))
+	while [ "${existloop}" != "${total}" ]
+		do
+			export currentpkg=${ALL[$existloop]}
+			if [ -z "$(git ls-remote "https://aur.archlinux.org/${currentpkg}.git")" ]
+				then echo -e "${red}Package ${currentpkg} doesn't exist${none}"
+				exit
+			fi
+			((existloop++))
+		done
 }
 
 ifexists_local() {
-  exlocalloop="0"
-  ((total--))
-  while [ "${exlocalloop}" != "${total}" ]
-    do
-      export currentpkg=${ALL[$exlocalloop]}
-      if [ -z "$(pacman -Qq $currentpkg)" ]
-        then echo -e "${red}Package ${currentpkg} is not installed${none}"
-        exit
-      fi
-      ((exlocalloop++))
-    done
+	exlocalloop="0"
+	((total--))
+	while [ "${exlocalloop}" != "${total}" ]
+		do
+			export currentpkg=${ALL[$exlocalloop]}
+			if [ -z "$(pacman -Qq $currentpkg)" ]
+				then echo -e "${red}Package ${currentpkg} is not installed${none}"
+				exit
+			fi
+			((exlocalloop++))
+		done
 }
 
 recheckroot() {
-  if [ "$UID" = 0 ]
-    then echo "You must not be root, Makepkg will be angry"
-    exit 4
-  fi
+	if [ "$UID" = 0 ]
+		then echo "You must not be root, Makepkg will be angry"
+		exit 4
+	fi
 }
 
 askroot() {
-  read -n 1 -p "Do you want to ignore root verification ? y/n " r
-  echo
-  case $r in
-    y | Y ) echo Ignoring ;;
-    n | N ) recheckroot ;;
-  esac
+	read -n 1 -p "Do you want to ignore root verification ? y/n " r
+	echo
+	case $r in
+		y | Y ) echo Ignoring ;;
+		n | N ) recheckroot ;;
+	esac
 }
 
 checkroot() {
-  if [ "${UID}" = 0 ]
-    then askroot
-  fi
+	if [ "${UID}" = 0 ]
+		then askroot
+	fi
 }
 
 errormsg() {
-  echo -e "${red}\nUnrecognised option ${1}${none}"
-  usage
-  exit 2
+	echo -e "${red}\nUnrecognised option ${1}${none}"
+	usage
+	exit 2
 }
 
 if [ -z $1 ]
-  then echo -e "\nNo command provided"
-  usage
+	then echo -e "\nNo command provided"
+	usage
 fi
 
 check() {
-  if [ -z $arg ]
-    then echo -e "${red}\nNo package specified${none}"
-    usage
-  fi
+	if [ -z $arg ]
+		then echo -e "${red}\nNo package specified${none}"
+		usage
+	fi
 }
 
 download() {
-  check
-  ifexists ${ALL[@]}
-  downloadloop="0"
-  while [ "${total}" != "${downloadloop}" ]
-  do
-    currentpkg=${ALL[$downloadloop]}
-    if [ ! -d "${tmpdir}/${currentpkg}" ]
-    then
-    git clone "https://aur.archlinux.org/${currentpkg}.git" --quiet
-    fi
-    echo "Package ${currentpkg} stored in ${HOME}/.aur/tmp/"
-    ((downloadloop++))
-  done
+	check
+	ifexists ${ALL[@]}
+	downloadloop="0"
+	while [ "${total}" != "${downloadloop}" ]
+	do
+		currentpkg=${ALL[$downloadloop]}
+		if [ ! -d "${tmpdir}/${currentpkg}" ]
+		then
+		git clone "https://aur.archlinux.org/${currentpkg}.git" --quiet
+		fi
+		echo "Package ${currentpkg} stored in ${HOME}/.aur/tmp/"
+		((downloadloop++))
+	done
 }
 
 install() {
-  cd ${tmpdir}
-  if [ "${action}" = "install" ]
-    then
-    ifexists ${ALL[@]}
-    if [ "${action}" = "install" ]
-      then
-      check
-    fi
-  fi
-  checkroot
-  installloop="0"
-  read -n 1 -p "Do you want to ignore checks from makepkg ? y/n " f
-  echo
-  case ${f} in
-    y | Y ) export skip="--skipinteg" ;;
-    n | N ) export skip= ;;
-  esac
-  read -n 1 -p "Do you cant to clean packages installed by makepkg ? y/n " c
-  echo
-  case ${c} in
-    y | Y ) export clean="rc" ;;
-    n | N ) export clean= ;;
-  esac
-  if [ "${action}" = "install" ]
-    then
-    while [ "${installloop}" != "${total}" ]
-    do
-      currentpkg="${ALL[$installloop]}"
-      if [ ! -d ${currentpkg} ]
-        then
-        git clone "https://aur.archlinux.org/${currentpkg}.git" --quiet
-      fi
-      cd ${currentpkg}
-      makepkg -si${clean} ${skip}
-      ((installloop++));
-    done
-  else
-    if [ ! -d ${currentpkg} ]
-      then
-      git clone "https://aur.archlinux.org/${currentpkg}.git" --quiet
-    fi
-    cd ${currentpkg}
-    makepkg -si${clean} ${skip}
-  fi
-  read -n 1 -p "Do you want to remove the source directory ? y/n " d
-  echo
-  case ${d} in
-    y | Y ) rm -rf ${tmpdir}/${currentpkg} ;;
-    n | N ) ;;
-  esac
+	cd ${tmpdir}
+	if [ "${action}" = "install" ]
+		then
+		ifexists ${ALL[@]}
+		if [ "${action}" = "install" ]
+			then
+			check
+		fi
+	fi
+	checkroot
+	installloop="0"
+	read -n 1 -p "Do you want to ignore checks from makepkg ? y/n " f
+	echo
+	case ${f} in
+		y | Y ) export skip="--skipinteg" ;;
+		n | N ) export skip= ;;
+	esac
+	read -n 1 -p "Do you cant to clean packages installed by makepkg ? y/n " c
+	echo
+	case ${c} in
+		y | Y ) export clean="rc" ;;
+		n | N ) export clean= ;;
+	esac
+	if [ "${action}" = "install" ]
+		then
+		while [ "${installloop}" != "${total}" ]
+		do
+			currentpkg="${ALL[$installloop]}"
+			if [ ! -d ${currentpkg} ]
+				then
+				git clone "https://aur.archlinux.org/${currentpkg}.git" --quiet
+			fi
+			cd ${currentpkg}
+			makepkg -si${clean} ${skip}
+			((installloop++));
+		done
+	else
+		if [ ! -d ${currentpkg} ]
+			then
+			git clone "https://aur.archlinux.org/${currentpkg}.git" --quiet
+		fi
+		cd ${currentpkg}
+		makepkg -si${clean} ${skip}
+	fi
+	read -n 1 -p "Do you want to remove the source directory ? y/n " d
+	echo
+	case ${d} in
+		y | Y ) rm -rf ${tmpdir}/${currentpkg} ;;
+		n | N ) ;;
+	esac
 }
 
 asktoinstall() {
-  read -n 1 -p "Do you want to (re)install this package ? y/n " in
-  echo
-  case ${in} in
-    y | Y ) install ${currentpkg} ;;
-    n | N ) ;;
-  esac
+	read -n 1 -p "Do you want to (re)install this package ? y/n " in
+	echo
+	case ${in} in
+		y | Y ) install ${currentpkg} ;;
+		n | N ) ;;
+	esac
 }
 
 pkgbuild() {
-  check
-  ifexists ${ALL[@]}
-  pkgbuildloop="0"
-  while [ "${pkgbuildloop}" != "${total}" ]
-  do
-    export currentpkg=${ALL[$pkgbuildloop]}
-    curl -s "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=${currentpkg}"
-    asktoinstall ${currentpkg}
-    ((pkgbuildloop++))
-  done
+	check
+	ifexists ${ALL[@]}
+	pkgbuildloop="0"
+	while [ "${pkgbuildloop}" != "${total}" ]
+	do
+		export currentpkg=${ALL[$pkgbuildloop]}
+		curl -s "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=${currentpkg}"
+		asktoinstall ${currentpkg}
+		((pkgbuildloop++))
+	done
 }
 
 info() {
-  check
-  ifexists ${ALL[@]}
-  infoloop="0"
-  while [ "${infoloop}" != "${total}" ]
-  do
-    export currentpkg=${ALL[$infoloop]}
-    curl -s "https://aur.archlinux.org/rpc/?v=5&type=info&arg=${currentpkg}" | jshon
-    asktoinstall ${currentpkg}
-    ((infoloop++))
-  done
+	check
+	ifexists ${ALL[@]}
+	infoloop="0"
+	while [ "${infoloop}" != "${total}" ]
+	do
+		export currentpkg=${ALL[$infoloop]}
+		curl -s "https://aur.archlinux.org/rpc/?v=5&type=info&arg=${currentpkg}" | jshon
+		asktoinstall ${currentpkg}
+		((infoloop++))
+	done
 }
 
 search() {
-  check
-  read -n 1 -p "Do you want to search by name only ? y/n " n
-  echo
-  case ${n} in
-    y | Y ) export name="name" ;;
-    n | N ) export name= ;;
-  esac
-  searchloop="0"
-  ((total--))
-  declare -a finalargs=()
-  while [ "${total}" != "${searchloop}" ]
-  do
-    finalargs+=$(echo ${ALL[$searchloop]} | awk '{print "&arg="$0}')
-    ((searchloop++))
-  done
-  if [ "$name" = "name" ]
-    then curl -s "https://aur.archlinux.org/rpc/?v=5&type=search&by=name${finalargs}" | jshon | grep -e Name -e Description -e Maintainer -e "\"URL\"" | sed 's/.*Name.*/\x1B[32m&\x1B[0m/' | sed 's/   "Name": /\x1B[31mName=\x1B[32m/' | sed 's/"URL": /URL=/' | sed 's/"Description": /Description=/' | sed 's/"Maintainer": /Maintainer=/' | sed 's/,$//' | sed 's/\\\//\//g' | sed 's/\"//g'
-    else curl -s "https://aur.archlinux.org/rpc/?v=5&type=search${finalargs}" | jshon | grep -e Name -e Description -e Maintainer -e "\"URL\"" | sed 's/.*Name.*/\x1B[32m&\x1B[0m/' | sed 's/   "Name": /\x1B[31mName=\x1B[32m/' | sed 's/"URL": /URL=/' | sed 's/"Description": /Description=/' | sed 's/"Maintainer": /Maintainer=/' | sed 's/,$//' | sed 's/\\\//\//g' | sed 's/\"//g'
-  fi
+	check
+	read -n 1 -p "Do you want to search by name only ? y/n " n
+	echo
+	case ${n} in
+		y | Y ) export name="name" ;;
+		n | N ) export name= ;;
+	esac
+	searchloop="0"
+	((total--))
+	declare -a finalargs=()
+	while [ "${total}" != "${searchloop}" ]
+	do
+		finalargs+=$(echo ${ALL[$searchloop]} | awk '{print "&arg="$0}')
+		((searchloop++))
+	done
+	if [ "$name" = "name" ]
+		then curl -s "https://aur.archlinux.org/rpc/?v=5&type=search&by=name${finalargs}" | jshon | grep -e Name -e Description -e Maintainer -e "\"URL\"" | sed 's/.*Name.*/\x1B[32m&\x1B[0m/' | sed 's/	 "Name": /\x1B[31mName=\x1B[32m/' | sed 's/"URL": /URL=/' | sed 's/"Description": /Description=/' | sed 's/"Maintainer": /Maintainer=/' | sed 's/,$//' | sed 's/\\\//\//g' | sed 's/\"//g'
+		else curl -s "https://aur.archlinux.org/rpc/?v=5&type=search${finalargs}" | jshon | grep -e Name -e Description -e Maintainer -e "\"URL\"" | sed 's/.*Name.*/\x1B[32m&\x1B[0m/' | sed 's/	 "Name": /\x1B[31mName=\x1B[32m/' | sed 's/"URL": /URL=/' | sed 's/"Description": /Description=/' | sed 's/"Maintainer": /Maintainer=/' | sed 's/,$//' | sed 's/\\\//\//g' | sed 's/\"//g'
+	fi
 }
 
 checkdifferences() {
-  source ${tmpfile}
-  source ${tmpfile2}
-  if [ -n "$(diff ${tmpfile} ${tmpfile2} -y --suppress-common-lines | sed 's/=.*//g')" ]; then
-    diff $tmpfile $tmpfile2 -y --suppress-common-lines | sed 's/=.*//g' > ${tmpfile3}
-    todo=$(awk '{print "ALL+=('\''"$0"'\'')"}' < ${tmpfile3})
-    echo "declare -a ALL=()" > ${tmpfile4}
-    echo $todo | sed 's/ /\n/g' >> ${tmpfile4}
-    total=$(echo ${todo} | sed 's/ /\n/g' | wc -l)
-    source ${tmpfile4}
-    diffloop="0"
-    while [ "${total}" != "${diffloop}" ]
-    do
-      export currentpkg=${ALL[$diffloop]}
-      echo -e "${green}Package ${currentpkg} updatable${none}"
-      asktoinstall ${currentpkg}
-      ((diffloop++))
-    done
-    rm ${tmpfile3} ${tmpfile4}
-  else echo "No packages to update"
-  fi
-  rm ${tmpfile2} ${tmpfile}
+	source ${tmpfile}
+	source ${tmpfile2}
+	if [ -n "$(diff ${tmpfile} ${tmpfile2} -y --suppress-common-lines | sed 's/=.*//g')" ]; then
+		diff $tmpfile $tmpfile2 -y --suppress-common-lines | sed 's/=.*//g' > ${tmpfile3}
+		todo=$(awk '{print "ALL+=('\''"$0"'\'')"}' < ${tmpfile3})
+		echo "declare -a ALL=()" > ${tmpfile4}
+		echo $todo | sed 's/ /\n/g' >> ${tmpfile4}
+		total=$(echo ${todo} | sed 's/ /\n/g' | wc -l)
+		source ${tmpfile4}
+		diffloop="0"
+		while [ "${total}" != "${diffloop}" ]
+		do
+			export currentpkg=${ALL[$diffloop]}
+			echo -e "${green}Package ${currentpkg} updatable${none}"
+			asktoinstall ${currentpkg}
+			((diffloop++))
+		done
+		rm ${tmpfile3} ${tmpfile4}
+	else echo "No packages to update"
+	fi
+	rm ${tmpfile2} ${tmpfile}
 }
 
 checkdifferences_partial() {
-  source ${tmpfile}
-  source ${tmpfile2}
-  while [ "${total}" != "${difpartloop}" ]
-  do
-    export currentpkg=${ALL[$difpartloop]}
-    if [ -z "$(diff -y ${tmpfile} ${tmpfile2} | grep ${currentpkg} | grep "|")" ]
-      then read -n 1 -p "Package ${currentpkg} alreadyup to date, install it anyway ? y/n " fup
-      echo
-      case ${fup} in
-        y | Y ) echo ${currentpkg} >> ${tmpfile3} ;;
-        n | N ) ;;
-      esac
-    else echo ${currentpkg} >> ${tmpfile3}
-    fi
-    ((difpartloop++))
-  done
-  todo=$(awk '{print "ALL+=('\''"$0"'\'')"}' < ${tmpfile3})
-  echo "declare -a ALL=()" > ${tmpfile4}
-  echo ${todo} | sed 's/ /\n/g' >> ${tmpfile4}
-  rm ${tmpfile3}
-  totalupdate=$(echo ${todo} | sed 's/ /\n/g' | wc -l)
-  source ${tmpfile4}
-  touploop="0"
-  echo ${totalupdate} ${touploop}
-  while [ "${totalupdate}" != "${touploop}" ]
-  do
-    export currentpkg=${ALL[$touploop]}
-    install ${currentpkg}
-    ((touploop++))
-  done
-  rm ${tmpfile4} ${tmpfile2} ${tmpfile}
+	source ${tmpfile}
+	source ${tmpfile2}
+	while [ "${total}" != "${difpartloop}" ]
+	do
+		export currentpkg=${ALL[$difpartloop]}
+		if [ -z "$(diff -y ${tmpfile} ${tmpfile2} | grep ${currentpkg} | grep "|")" ]
+			then read -n 1 -p "Package ${currentpkg} alreadyup to date, install it anyway ? y/n " fup
+			echo
+			case ${fup} in
+				y | Y ) echo ${currentpkg} >> ${tmpfile3} ;;
+				n | N ) ;;
+			esac
+		else echo ${currentpkg} >> ${tmpfile3}
+		fi
+		((difpartloop++))
+	done
+	todo=$(awk '{print "ALL+=('\''"$0"'\'')"}' < ${tmpfile3})
+	echo "declare -a ALL=()" > ${tmpfile4}
+	echo ${todo} | sed 's/ /\n/g' >> ${tmpfile4}
+	rm ${tmpfile3}
+	totalupdate=$(echo ${todo} | sed 's/ /\n/g' | wc -l)
+	source ${tmpfile4}
+	touploop="0"
+	echo ${totalupdate} ${touploop}
+	while [ "${totalupdate}" != "${touploop}" ]
+	do
+		export currentpkg=${ALL[$touploop]}
+		install ${currentpkg}
+		((touploop++))
+	done
+	rm ${tmpfile4} ${tmpfile2} ${tmpfile}
 }
 
 pacinfo() {
-  echo ${installed} | sed 's/ /\n/g' | awk '{print $0"\" | jshon"}' | awk '{print "curl -s \"https://aur.archlinux.org/rpc/?v=5&type=info&arg="$0}' | sh | grep -e Name -e Version | sed 's/   "Name": /Name=/g' | sed 's/   "Version": /Version=/g' | sed 's/",$//g' | sed 's/Name="//g' | sed -z 's/\nVersion="/=/g' | sed 's/"$//' > ${tmpfile}
-  echo ${installed} | sed 's/ /\n/g' | awk '{print "LC_ALL=en_US.UTF-8 pacman -Qi "$0}' | awk '{print $0" | grep -e Name -e Version | sed '\''s/.*: //g'\'' | sed -z '\''s/\\n/=/'\''"}' | sh > ${tmpfile2}
-  checkdifferences
+	echo ${installed} | sed 's/ /\n/g' | awk '{print $0"\" | jshon"}' | awk '{print "curl -s \"https://aur.archlinux.org/rpc/?v=5&type=info&arg="$0}' | sh | grep -e Name -e Version | sed 's/   "Name": /Name=/g' | sed 's/   "Version": /Version=/g' | sed 's/",$//g' | sed 's/Name="//g' | sed -z 's/\nVersion="/=/g' | sed 's/"$//' > ${tmpfile}
+	echo ${installed} | sed 's/ /\n/g' | awk '{print "LC_ALL=en_US.UTF-8 pacman -Qi "$0}' | awk '{print $0" | grep -e Name -e Version | sed '\''s/.*: //g'\'' | sed -z '\''s/\\n/=/'\''"}' | sh > ${tmpfile2}
+	checkdifferences
 }
 
 checkupdate() {
-  chuloop="0"
-  ifexists ${ALL[@]}
-  ifexists_local ${ALL[@]}
-  while [ "${total}" != "${chuloop}" ]
-    do
-    export currentpkg=${ALL[$chuloop]}
-    LC_ALL=en_US.UTF-8 pacman -Qi ${currentpkg} | grep -e Name -e Version | sed 's/.*: //' | sed -z 's/\n/=/' >> ${tmpfile2}
-    echo ${currentpkg} | sed 's/ /\n/g' | awk '{print $0"\" | jshon"}' | awk '{print "curl -s \"https://aur.archlinux.org/rpc/?v=5&type=info&arg="$0}' | sh | grep -e Name -e Version | sed 's/   "Name": /Name=/g' | sed 's/   "Version": /Version=/g' | sed 's/",$//g' | sed 's/Name="//g' | sed -z 's/\nVersion="/=/g' | sed 's/"$//' >> ${tmpfile}
-    ((chuloop++))
-    done
-  checkdifferences_partial ${ALL[@]}
+	chuloop="0"
+	ifexists ${ALL[@]}
+	ifexists_local ${ALL[@]}
+	while [ "${total}" != "${chuloop}" ]
+		do
+		export currentpkg=${ALL[$chuloop]}
+		LC_ALL=en_US.UTF-8 pacman -Qi ${currentpkg} | grep -e Name -e Version | sed 's/.*: //' | sed -z 's/\n/=/' >> ${tmpfile2}
+		echo ${currentpkg} | sed 's/ /\n/g' | awk '{print $0"\" | jshon"}' | awk '{print "curl -s \"https://aur.archlinux.org/rpc/?v=5&type=info&arg="$0}' | sh | grep -e Name -e Version | sed 's/	 "Name": /Name=/g' | sed 's/	 "Version": /Version=/g' | sed 's/",$//g' | sed 's/Name="//g' | sed -z 's/\nVersion="/=/g' | sed 's/"$//' >> ${tmpfile}
+		((chuloop++))
+		done
+	checkdifferences_partial ${ALL[@]}
 }
 
 update() {
-  export installed=$(pacman -Qqm)
-  if [ -z "${installed}" ]
-    then echo "No packages installed from aur"
-    exit 0
-  fi
-  if [ -z "${arg}" ] || [ "${arg}" = "" ]
-  then pacinfo ${installed}
-  else checkupdate ${ALL[@]}
-  fi
+	export installed=$(pacman -Qqm)
+	if [ -z "${installed}" ]
+		then echo "No packages installed from aur"
+		exit 0
+	fi
+	if [ -z "${arg}" ] || [ "${arg}" = "" ]
+	then pacinfo ${installed}
+	else checkupdate ${ALL[@]}
+	fi
 }
 
 list() {
@@ -337,13 +337,13 @@ done
 current=1
 
 case $1 in
-  -i | --install ) action=install && install ${ALL[@]} ;;
-  -s | --search ) action=search && search ${ALL[@]} ;;
-  -d | --download ) action=download && download ${ALL[@]} ;;
-  -u | --update ) action=update && update ;;
-  -l | --list ) action=list && list ;;
-  -a | --info ) action=info && info ${ALL[@]} ;;
-  -p | --pkgbuild ) action=pkgbuild && pkgbuild ${ALL[@]} ;;
-  -h | --help | --usage ) action=help && usage ;;
-  * ) errormsg ${1} ;;
+	-i | --install ) action=install && install ${ALL[@]} ;;
+	-s | --search ) action=search && search ${ALL[@]} ;;
+	-d | --download ) action=download && download ${ALL[@]} ;;
+	-u | --update ) action=update && update ;;
+	-l | --list ) action=list && list ;;
+	-a | --info ) action=info && info ${ALL[@]} ;;
+	-p | --pkgbuild ) action=pkgbuild && pkgbuild ${ALL[@]} ;;
+	-h | --help | --usage ) action=help && usage ;;
+	* ) errormsg ${1} ;;
 esac
