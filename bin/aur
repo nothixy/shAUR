@@ -326,7 +326,9 @@ _update() {
 
 _list() {
 	if [ -n "$(pacman -Qm)" ]; then
-		pacman -Qm | cat | awk '{print "Name="$0}' | sed 's/ /\nVersion=/' | sed 's/Name=.*/\x1B[31m&\x1B[0m/' | sed 's/Name=/\x1B[31m&\x1B[32m/'
+		while read p; do
+			echo $p | sed 's/\(.*\)\ \(.*\)/\x1B[1;31m\1\x1B[0m\ \x1B[1;32m\2\x1B[0m/'
+		done <<< $(pacman -Qm)
 	else
 		echo "No packages installed from aur"
 	fi
