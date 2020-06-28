@@ -11,3 +11,7 @@ Install 'jshon' with your package manager
 Copy everything to /usr/, and run aur
 
 Supports bash-completion, pacman syntax
+
+## Screenshot
+
+![Screenshot](/screenshot.png)
