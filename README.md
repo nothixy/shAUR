@@ -1,6 +1,6 @@
-# AUR wrapper
+# shAUR
 
-## A simple AUR wrapper written in bash - WIP
+## A simple AUR shell script written in bash - WIP
 
 ## Prerequisites
 
